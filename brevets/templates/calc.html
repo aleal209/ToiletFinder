@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Toilet Finder</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+    <style>
+        .clickable-rectangle {
+            width: 4000px;
+            height: 200px;
+            background-color: #007bff;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 30px;
+        }
+        .red:hover {
+            background-color: darkred;
+        }
+        .red {
+            background-color: red;
+        }
+        .blue:hover {
+            background-color: darkblue;
+        }
+        .blue {
+            background-color: blue;
+        }
+        .purple:hover {
+            background-color: darkmagenta;
+        }
+        .purple {
+            background-color: magenta;
+        }
+        .green:hover {
+            background-color: darkgreen;
+        }
+        .green {
+            background-color: green;
+        }
+    </style>
+</head>
+<body>
+    <div class="container text-center mt-5">
+        <h1>Toilet Finder</h1>
+        <p>Click on a rectangle to perform an action.</p>
+        <div class="d-flex justify-content-around">
+            <div class="clickable-rectangle red" onclick="alert('Action 1 clicked!')">Men</div>
+            <div class="clickable-rectangle blue" onclick="alert('Action 2 clicked!')">Women</div>
+            <div class="clickable-rectangle purple" onclick="alert('Action 3 clicked!')">Gender Neutral</div>
+            <div class="clickable-rectangle green" onclick="alert('Action 4 clicked!')">Add Bathroom</div>
+        </div>
+    </div>
+</body>
+</html>
+
