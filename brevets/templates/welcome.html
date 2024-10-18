@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Toilet Buddy</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            position: relative; /* Enable positioning for absolute children */
+            background: linear-gradient(to bottom, #87CEEB 0%, #87CEEB 75%, #3CB371 75%, #3CB371 100%); /* Sky and grass */
+        }
+        .clickable-rectangle {
+            width: 600px;
+            height: 370px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin: 10px;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            position: absolute; /* Allow positioning to the corners */
+        }
+        .clickable-rectangle:hover {
+            transform: scale(1.1);
+        }
+        .red {
+            background-color: red;
+            top: 75px; /* Top left */
+            left: 150px;
+        }
+        .blue {
+            background-color: blue;
+            top: 75px; /* Top right */
+            right: 150px;
+        }
+        .yellow {
+            background-color: yellow;
+            color: black;
+            bottom: 25px; /* Bottom left */
+            left: 150px;
+        }
+        .green {
+            background-color: green;
+            bottom: 25px; /* Bottom right */
+            right: 150px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container text-center">
+        <h1>Toilet Buddy</h1>
+        <h2>Click on a seat to find/add a bathroom.</h2>
+    </div>
+    <div class="clickable-rectangle red" onclick="window.open('https://www.google.com/maps/place/595+E+18th+Ave,+Eugene,+OR+97401/@44.0401904,-123.0889002,17z/data=!3m1!4b1!4m6!3m5!1s0x54c11e47b05e3d41:0x7b7c748c6ec0a588!8m2!3d44.0401905!4d-123.0840347!16s%2Fg%2F11cskkgy93?entry=ttu&g_ep=EgoyMDI0MTAxNS4wIKXMDSoASAFQAw%3D%3D', '_blank')">Women</div>
+    <div class="clickable-rectangle blue" onclick="window.open('https://www.google.com/maps/search/men\'s+bathroom+near+me', '_blank')">Men</div>
+    <div class="clickable-rectangle yellow" onclick="window.open('https://www.google.com/maps/search/gender+neutral+bathroom+near+me', '_blank')">Gender Neutral</div>
+    <div class="clickable-rectangle green" onclick="window.open('https://www.google.com/maps', '_blank')">Add</div>
+</body>
+</html>

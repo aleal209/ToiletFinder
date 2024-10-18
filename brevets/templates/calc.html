@@ -1,40 +1,73 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>ACP Controle Times</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <title>Bathroom Locator</title>
     <style>
-        .clickable-rectangle {
-            width: 200px;
-            height: 100px;
-            background-color: #007bff;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 10px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .clickable-rectangle:hover {
-            background-color: #0056b3;
-        }
+        #map { height: 800px; }
+        .input-container { margin: 20px; }
     </style>
 </head>
 <body>
-    <div class="container text-center mt-5">
-        <h1>ACP Brevet Actions</h1>
-        <p>Click on a rectangle to perform an action.</p>
-        <div class="d-flex justify-content-around">
-            <div class="clickable-rectangle" onclick="alert('Action 1 clicked!')">Action 1</div>
-            <div class="clickable-rectangle" onclick="alert('Action 2 clicked!')">Action 2</div>
-            <div class="clickable-rectangle" onclick="alert('Action 3 clicked!')">Action 3</div>
-            <div class="clickable-rectangle" onclick="alert('Action 4 clicked!')">Action 4</div>
-        </div>
+    <div class="input-container">
+        <button id="find-location">Find My Location</button>
     </div>
+    <div id="map"></div>
+    
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+        // Initialize the map centered on a default location (University of Oregon)
+        var map = L.map('map').setView([44.0449, -123.0752], 13);  
+        
+        // Add tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);  
+        
+        // Marker for the user's location
+        var userMarker = L.marker([44.0449, -123.0752]).addTo(map)
+            .bindPopup('You are here!')
+            .openPopup();
+
+        // Function to fetch bathroom locations from MongoDB
+        function fetchBathroomLocations() {
+            // Simulated fetch from MongoDB (replace with actual fetch logic)
+            return [
+                { name: 'Bathroom 1', lat: 44.0464, lon: -123.0777 },
+                { name: 'Bathroom 2', lat: 44.0420, lon: -123.0742 },
+                { name: 'Bathroom 3', lat: 44.0450, lon: -123.0730 }
+            ];
+        }
+
+        // Function to display bathrooms on the map
+        function displayBathrooms(bathrooms) {
+            bathrooms.forEach(function(bathroom) {
+                L.marker([bathroom.lat, bathroom.lon]).addTo(map)
+                    .bindPopup(bathroom.name);
+            });
+        }
+
+        // Handle the button click event to find user location
+        document.getElementById('find-location').addEventListener('click', function() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    var lat = position.coords.latitude;
+                    var lon = position.coords.longitude;
+
+                    // Update the map view
+                    map.setView([lat, lon], 15);
+                    userMarker.setLatLng([lat, lon]).bindPopup('You are here!').openPopup();
+
+                    // Fetch bathroom locations and display them
+                    var bathrooms = fetchBathroomLocations(); // Simulated fetch
+                    displayBathrooms(bathrooms);
+                }, function() {
+                    alert('Unable to retrieve your location. Please check your device settings.');
+                }, { enableHighAccuracy: true });
+            } else {
+                alert('Geolocation is not supported by this browser.');
+            }
+        });
+    </script>
 </body>
 </html>
-
