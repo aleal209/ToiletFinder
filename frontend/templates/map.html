@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-    <title>Bathroom Locator</title>
+    <title>Toilet Buddy</title>
     <style>
         #map { height: 800px; }
         .input-container { margin: 20px; }
@@ -18,16 +18,14 @@
     
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script>
-        // Initialize the map centered on a default location (University of Oregon)
-        var map = L.map('map').setView([44.0449, -123.0752], 13);  
-        
+        // Initialize the map without setting a view
+        var map = L.map('map');
+
         // Add tile layer
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);  
         
         // Marker for the user's location
-        var userMarker = L.marker([44.0449, -123.0752]).addTo(map)
-            .bindPopup('You are here!')
-            .openPopup();
+        var userMarker;
 
         // Function to fetch bathroom locations from MongoDB
         function fetchBathroomLocations() {
@@ -54,9 +52,10 @@
                     var lat = position.coords.latitude;
                     var lon = position.coords.longitude;
 
-                    // Update the map view
-                    map.setView([lat, lon], 15);
-                    userMarker.setLatLng([lat, lon]).bindPopup('You are here!').openPopup();
+                    // Set the map view to the user's location with zoom level 18
+                    map.setView([lat, lon], 18);
+                    userMarker = L.marker([lat, lon]).addTo(map)
+                        .bindPopup('You are here!').openPopup();
 
                     // Fetch bathroom locations and display them
                     var bathrooms = fetchBathroomLocations(); // Simulated fetch

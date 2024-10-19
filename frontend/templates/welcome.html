@@ -4,7 +4,7 @@
     <title>Toilet Buddy</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
     <style>
         body, html {
             height: 100%;
@@ -58,9 +58,9 @@
         <h1>Toilet Buddy</h1>
         <h2>Click on a seat to find/add a bathroom.</h2>
     </div>
-    <div class="clickable-rectangle red" onclick="window.open('https://www.google.com/maps/place/595+E+18th+Ave,+Eugene,+OR+97401/@44.0401904,-123.0889002,17z/data=!3m1!4b1!4m6!3m5!1s0x54c11e47b05e3d41:0x7b7c748c6ec0a588!8m2!3d44.0401905!4d-123.0840347!16s%2Fg%2F11cskkgy93?entry=ttu&g_ep=EgoyMDI0MTAxNS4wIKXMDSoASAFQAw%3D%3D', '_blank')">Women</div>
-    <div class="clickable-rectangle blue" onclick="window.open('https://www.google.com/maps/search/men\'s+bathroom+near+me', '_blank')">Men</div>
-    <div class="clickable-rectangle yellow" onclick="window.open('https://www.google.com/maps/search/gender+neutral+bathroom+near+me', '_blank')">Gender Neutral</div>
-    <div class="clickable-rectangle green" onclick="window.open('https://www.google.com/maps', '_blank')">Add</div>
+    <div class="clickable-rectangle red" onclick="window.location.href='/find-bathroom'">Women</div>
+    <div class="clickable-rectangle blue" onclick="window.location.href='/find-bathroom'">Men</div>
+    <div class="clickable-rectangle yellow" onclick="window.location.href='/find-bathroom'">Gender Neutral</div>
+    <div class="clickable-rectangle green" onclick="window.location.href='/add-bathroom'">Add</div>
 </body>
 </html>
