@@ -8,18 +8,20 @@
     <style>
         #map { height: 800px; }
         .input-container { margin: 20px; }
+        #back-button { margin-bottom: 20px; }
     </style>
 </head>
 <body>
     <div class="input-container">
+        <button id="back-button">Back</button>
         <button id="find-location">Find My Location</button>
     </div>
     <div id="map"></div>
     
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script>
-        // Initialize the map without setting a view
-        var map = L.map('map');
+        // Initialize the map
+        var map = L.map('map'); // Set an initial view
 
         // Add tile layer
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);  
@@ -45,27 +47,75 @@
             });
         }
 
+        let watchID;
+
         // Handle the button click event to find user location
         document.getElementById('find-location').addEventListener('click', function() {
             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function(position) {
-                    var lat = position.coords.latitude;
-                    var lon = position.coords.longitude;
+                navigator.geolocation.getCurrentPosition(onSuccess, onError, {
+                    enableHighAccuracy: true,
+                    timeout: 15000,
+                    maximumAge: 0
+                });
+                    // Watch for position updates with high accuracy
+                    navigator.geolocation.watchPosition(function(position) {
+                    if (position.coords.accuracy < 25) { // Only use updates with < 50 meters accuracy
+                        var lat = position.coords.latitude;
+                        var lon = position.coords.longitude;
 
-                    // Set the map view to the user's location with zoom level 18
-                    map.setView([lat, lon], 18);
-                    userMarker = L.marker([lat, lon]).addTo(map)
-                        .bindPopup('You are here!').openPopup();
+                        // Set the map view to the updated user location with zoom level 16
+                        map.setView([lat, lon], 18);
 
-                    // Fetch bathroom locations and display them
-                    var bathrooms = fetchBathroomLocations(); // Simulated fetch
-                    displayBathrooms(bathrooms);
-                }, function() {
-                    alert('Unable to retrieve your location. Please check your device settings.');
-                }, { enableHighAccuracy: true });
+                        // Update or add the location marker
+                        if (locationMarker) {
+                            locationMarker.setLatLng([lat, lon]).update();
+                        } else {
+                            locationMarker = L.marker([lat, lon]).addTo(map)
+                                .bindPopup('This is your updated location').openPopup();
+                        }
+
+                        navigator.geolocation.clearWatch(watchID);
+                    }
+                }, onError, {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                });
+
+                
+
             } else {
                 alert('Geolocation is not supported by this browser.');
             }
+
+            function onSuccess(position) {
+                var lat = position.coords.latitude;
+                var lon = position.coords.longitude;
+
+                // Set the map view to the user's location with zoom level 18
+                map.setView([lat, lon], 18);
+                
+                // Check if userMarker already exists
+                if (userMarker) {
+                    userMarker.setLatLng([lat, lon]).update(); // Move the existing marker
+                } else {
+                    userMarker = L.marker([lat, lon]).addTo(map)
+                        .bindPopup('You are here!').openPopup();
+                }
+
+                // Fetch bathroom locations and display them
+                var bathrooms = fetchBathroomLocations(); // Simulated fetch
+                displayBathrooms(bathrooms);
+            }
+
+            function onError(error) {
+                alert('Geolocation error: ' + error.message);
+            }
+        });
+
+        // Handle the back button click event
+        document.getElementById('back-button').addEventListener('click', function() {
+            window.history.back(); // Go back to the previous page
         });
     </script>
 </body>
