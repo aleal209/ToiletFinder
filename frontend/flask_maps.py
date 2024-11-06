@@ -4,15 +4,14 @@ import arrow
 import config
 import logging
 import csv
-import pymongo
-from pymongo import MongoClient
+from mypymongo import brevet_insert, brevet_find
 
 app = flask.Flask(__name__)
 CONFIG = config.configuration()
 
-cluster = MongoClient("mongodb+srv://dbUser:BananaLOL@toiletbuddy.dxyty.mongodb.net/?retryWrites=true&w=majority&appName=ToiletBuddy")
-db = cluster["ToiletBuddies"]
-toilet_collection = db["Toilets"]
+# cluster = MongoClient("mongodb+srv://dbUser:BananaLOL@toiletbuddy.dxyty.mongodb.net/?retryWrites=true&w=majority&appName=ToiletBuddy")
+# db = cluster["ToiletBuddies"]
+# toilet_collection = db["Toilets"]
 
 # csv_file_path = "tb.csv"
 #
@@ -30,6 +29,7 @@ def index():
 
 @app.route("/find-bathroom")
 def find_bathroom():
+    # data = toilet_collection.find()
     return flask.render_template('map.html')
 
 @app.route("/add-bathroom")
