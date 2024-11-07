@@ -1,17 +1,17 @@
 import flask
-from flask import request
-import arrow
+from flask import jsonify
+from flask_cors import CORS
 import config
 import logging
-import csv
-from mypymongo import brevet_insert, brevet_find
+from mypymongo import MongoClient
 
 app = flask.Flask(__name__)
+CORS(app)  # Enable CORS for all routes
 CONFIG = config.configuration()
 
-# cluster = MongoClient("mongodb+srv://dbUser:BananaLOL@toiletbuddy.dxyty.mongodb.net/?retryWrites=true&w=majority&appName=ToiletBuddy")
-# db = cluster["ToiletBuddies"]
-# toilet_collection = db["Toilets"]
+cluster = MongoClient("mongodb+srv://dbUser:BananaLOL@toiletbuddy.dxyty.mongodb.net/?retryWrites=true&w=majority&appName=ToiletBuddy")
+db = cluster["ToiletBuddies"]
+toilet_collection = db["Toilets"]
 
 # csv_file_path = "tb.csv"
 #
@@ -29,7 +29,6 @@ def index():
 
 @app.route("/find-bathroom")
 def find_bathroom():
-    # data = toilet_collection.find()
     return flask.render_template('map.html')
 
 @app.route("/add-bathroom")
@@ -40,6 +39,16 @@ def add_bathroom():
 def page_not_found(error):
     app.logger.debug("Page not found")
     return flask.render_template('404.html'), 404
+
+@app.route('/api/data')
+def get_bathrooms():
+    bathrooms = toilet_collection.find()  # Fetch the data
+    bathrooms_list = [
+        {'name': bathroom['Name'], 'lat': float(bathroom['Lat']), 'lon': float(bathroom['Long'])}
+        for bathroom in bathrooms
+    ]
+    print("Fetched bathrooms:", bathrooms_list)  # Log the fetched data
+    return jsonify(bathrooms_list)
 
 app.debug = CONFIG.DEBUG
 if app.debug:
