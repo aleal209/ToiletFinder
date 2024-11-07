@@ -6,44 +6,97 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <title>Toilet Buddy</title>
     <style>
-        #map { height: 800px; }
-        .input-container { margin: 20px; }
-        #back-button { margin-bottom: 20px; }
+        body {
+            background-color: #bac8c6;
+            display: flex;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        #map {
+            height: 900px;
+            width: 80%;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            width: 20%;
+            overflow-y: auto;
+        }
+        .input-container {
+            margin-bottom: 20px;
+        }
+        #back-button {
+            margin-bottom: 20px;
+        }
+        #find-location {
+            margin-bottom: 20px;
+        }
+        .listview {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            overflow-y: auto;
+            max-height: 900px;
+        }
+        .listview-item {
+            background-color: #23a4af;
+            padding: 50px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(255, 0, 0, 0.1);
+        }
+        .listview-item h3 {
+            margin: 0;
+        }
+        .listview-item p {
+            margin: 5px 0 0;
+            color: #555;
+        }
     </style>
 </head>
 <body>
-    <div class="input-container">
-        <button id="back-button">Back</button>
-        <button id="find-location">Find My Location</button>
-    </div>
     <div id="map"></div>
-    
+    <div class="container">
+        <div class="input-container">
+            <button id="back-button">Back</button>
+            <button id="find-location">Find My Location</button>
+        </div>
+        <ul id="bathroom-list" class="listview">
+            <!-- List items will be dynamically populated here -->
+        </ul>
+    </div>
+
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script>
         // Initialize the map
-        var map = L.map('map'); // Set an initial view
+        var map = L.map('map').setView([44.0464, -123.0777], 14); // Set an initial view
 
         // Add tile layer
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);  
         
-        // Marker for the user's location
         var userMarker;
 
-        // Function to fetch bathroom locations from MongoDB
+        // Fetch bathroom locations from the Flask backend
         function fetchBathroomLocations() {
-
-            return [
-                { name: 'Bathroom 1', lat: 44.0464, lon: -123.0777 },
-                { name: 'Bathroom 2', lat: 44.0420, lon: -123.0742 },
-                { name: 'Bathroom 3', lat: 44.0450, lon: -123.0730 }
-            ];
+            fetch('/api/data')
+                .then(response => response.json())
+                .then(data => displayBathrooms(data))
+                .catch(error => console.error('Error fetching bathroom locations:', error));
         }
 
         // Function to display bathrooms on the map
         function displayBathrooms(bathrooms) {
             bathrooms.forEach(function(bathroom) {
+                // Add a marker to the map
                 L.marker([bathroom.lat, bathroom.lon]).addTo(map)
                     .bindPopup(bathroom.name);
+                
+                // Create a list item for each bathroom
+                var listItem = document.createElement('li');
+                listItem.className = 'listview-item';
+                listItem.innerHTML = `<h3>${bathroom.name}</h3><p>Lat: ${bathroom.lat}, Lon: ${bathroom.lon}</p>`;
+                document.getElementById('bathroom-list').appendChild(listItem);
             });
         }
 
@@ -57,8 +110,9 @@
                     timeout: 15000,
                     maximumAge: 0
                 });
-                    // Watch for position updates with high accuracy
-                    navigator.geolocation.watchPosition(function(position) {
+
+                // Watch for position updates with high accuracy
+                navigator.geolocation.watchPosition(function(position) {
                     if (position.coords.accuracy < 25) { // Only use updates with < 50 meters accuracy
                         var lat = position.coords.latitude;
                         var lon = position.coords.longitude;
@@ -67,10 +121,10 @@
                         map.setView([lat, lon], 18);
 
                         // Update or add the location marker
-                        if (locationMarker) {
-                            locationMarker.setLatLng([lat, lon]).update();
+                        if (userMarker) {
+                            userMarker.setLatLng([lat, lon]).update();
                         } else {
-                            locationMarker = L.marker([lat, lon]).addTo(map)
+                            userMarker = L.marker([lat, lon]).addTo(map)
                                 .bindPopup('This is your updated location').openPopup();
                         }
 
@@ -81,9 +135,6 @@
                     timeout: 10000,
                     maximumAge: 0
                 });
-
-                
-
             } else {
                 alert('Geolocation is not supported by this browser.');
             }
@@ -94,7 +145,7 @@
 
                 // Set the map view to the user's location with zoom level 18
                 map.setView([lat, lon], 18);
-                
+
                 // Check if userMarker already exists
                 if (userMarker) {
                     userMarker.setLatLng([lat, lon]).update(); // Move the existing marker
@@ -104,8 +155,7 @@
                 }
 
                 // Fetch bathroom locations and display them
-                var bathrooms = fetchBathroomLocations(); // Simulated fetch
-                displayBathrooms(bathrooms);
+                fetchBathroomLocations(); // Fetch data from Flask
             }
 
             function onError(error) {
@@ -117,6 +167,9 @@
         document.getElementById('back-button').addEventListener('click', function() {
             window.history.back(); // Go back to the previous page
         });
+
+        // Fetch and display bathrooms initially
+        fetchBathroomLocations();
     </script>
 </body>
 </html>
