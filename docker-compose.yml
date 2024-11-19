@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"  # Expose Flask frontend on port 5000
+    volumes:
+      - ./frontend:/app  # Map the frontend directory to /app in the container
+    environment:
+      - FLASK_ENV=development
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:latest
+    container_name: mongo_container
+    ports:
+      - "27017:27017"  # Expose MongoDB on default MongoDB port
+    volumes:
+      - mongo_data:/data/db  # Persist MongoDB data
+
+  backend:
+    build:
+      context: ./DockerMongo
+      dockerfile: Dockerfile
+    volumes:
+      - ./DockerMongo:/app  # Map the DockerMongo directory to /app in the container
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/toiletfinder  # Connection string for MongoDB
+
+volumes:
+  mongo_data:

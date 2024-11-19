@@ -4,13 +4,14 @@ from pymongo import MongoClient
 
 app = Flask(__name__)
 
-client = MongoClient('mongodb://' + os.environ['MONGODB_HOSTNAME'], 27017)
-db = client.tododb
+cluster = MongoClient("mongodb+srv://dbUser:BananaLOL@toiletbuddy.dxyty.mongodb.net/?retryWrites=true&w=majority&appName=ToiletBuddy")
+db = cluster["ToiletBuddies"]
+toilet_collection = db["Toilets"]
 
 @app.route('/')
 def index():
     return render_template('index.html',
-			  items=list(db.tododb.find()))
+			  items=list(toilet_collection.find()))
 
 @app.route('/insert/', methods=['POST'])
 def insert():
