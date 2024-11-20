@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
         body {
             background-color: #f8f9fa;
@@ -27,147 +26,79 @@
             height: 400px;
             margin-top: 20px;
         }
-        #star-rating i {
-            color: #ffc107;
-            cursor: pointer;
-            font-size: 24px;
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Add a Bathroom</h1>
         <form action="/submit-bathroom" method="POST">
+            <!-- Bathroom name -->
             <div class="form-group">
                 <label for="name">Bathroom Name:</label>
                 <input type="text" class="form-control" id="name" name="name" required>
             </div>
 
-            <!-- Star rating input -->
+            <!-- Gender dropdown -->
             <div class="form-group">
-                <label for="rating">Rating:</label>
-                <div id="star-rating">
-                    <i class="far fa-star" data-value="1"></i>
-                    <i class="far fa-star" data-value="2"></i>
-                    <i class="far fa-star" data-value="3"></i>
-                    <i class="far fa-star" data-value="4"></i>
-                    <i class="far fa-star" data-value="5"></i>
-                </div>
-                <input type="hidden" id="rating" name="rating" required>
+                <label for="gender">Gender:</label>
+                <select class="form-control" id="gender" name="gender" required>
+                    <option value="">Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Unisex">Unisex</option>
+                </select>
             </div>
 
-            <!-- Accessibility checkbox -->
-            <div class="form-group form-check">
-                <input type="checkbox" class="form-check-input" id="accessible" name="accessible">
-                <label class="form-check-label" for="accessible">Accessible Bathroom</label>
-            </div>
+            <!-- Hidden fields for latitude and longitude -->
+            <input type="hidden" id="latitude" name="lat" required>
+            <input type="hidden" id="longitude" name="lon" required>
 
-            <div class="form-group">
-                <label for="description">Description:</label>
-                <textarea class="form-control" id="description" name="description" rows="3"></textarea>
-            </div>
-
-            <!-- Add Location Button -->
-            <button type="button" class="btn btn-info" id="get-location">Get Location</button>
-
+            <!-- Map for location selection -->
+            <div id="map"></div>
+            <button type="button" class="btn btn-info mt-3" id="get-location">Get Location</button>
             <button type="submit" class="btn btn-primary mt-3">Add Bathroom</button>
             <a href="/" class="btn btn-secondary mt-3">Cancel</a>
         </form>
-
-        <!-- Map for showing location -->
-        <div id="map"></div>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script>
         // Initialize the map
-        var map = L.map('map').setView([0, 0], 2);  // Initial view centered globally
+        var map = L.map('map').setView([0, 0], 2); // Initial view globally centered
 
         // Add OpenStreetMap tiles
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-        // Marker for the user's selected location
+        // Marker for user-selected location
         var locationMarker;
 
-        let watchID;
-
-        // Handle 'Get Location' button click
+        // Handle "Get Location" button click
         document.getElementById('get-location').addEventListener('click', function() {
             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(onSuccess, onError, {
-                    enableHighAccuracy: true,
-                    timeout: 15000, // wait up to 15 seconds for better accuracy
-                    maximumAge: 0 // no cached location
-                });
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    var lat = position.coords.latitude;
+                    var lon = position.coords.longitude;
 
-                // Watch for position updates with high accuracy
-                navigator.geolocation.watchPosition(function(position) {
-                    if (position.coords.accuracy < 25) { // Only use updates with < 50 meters accuracy
-                        var lat = position.coords.latitude;
-                        var lon = position.coords.longitude;
+                    // Set map view and update hidden fields
+                    map.setView([lat, lon], 18);
+                    document.getElementById('latitude').value = lat;
+                    document.getElementById('longitude').value = lon;
 
-                        // Set the map view to the updated user location with zoom level 16
-                        map.setView([lat, lon], 18);
-
-                        // Update or add the location marker
-                        if (locationMarker) {
-                            locationMarker.setLatLng([lat, lon]).update();
-                        } else {
-                            locationMarker = L.marker([lat, lon]).addTo(map)
-                                .bindPopup('This is your updated location').openPopup();
-                        }
-
-                        navigator.geolocation.clearWatch(watchID);
+                    // Add or move the marker
+                    if (locationMarker) {
+                        locationMarker.setLatLng([lat, lon]).update();
+                    } else {
+                        locationMarker = L.marker([lat, lon]).addTo(map)
+                            .bindPopup('This is your selected location').openPopup();
                     }
-                }, onError, {
-                    enableHighAccuracy: true,
-                    timeout: 10000,
-                    maximumAge: 0
+                }, function(error) {
+                    alert('Error getting location: ' + error.message);
+                }, {
+                    enableHighAccuracy: true
                 });
-
             } else {
                 alert('Geolocation is not supported by this browser.');
             }
-
-            function onSuccess(position) {
-                var lat = position.coords.latitude;
-                var lon = position.coords.longitude;
-
-                // Set the map view to the user's location with zoom level 18
-                map.setView([lat, lon], 18);
-
-                // Place or move marker to the current location
-                if (locationMarker) {
-                    locationMarker.setLatLng([lat, lon]).update();
-                } else {
-                    locationMarker = L.marker([lat, lon]).addTo(map)
-                        .bindPopup('This is your location').openPopup();
-                }
-            }
-
-            function onError(error) {
-                alert('Geolocation error: ' + error.message);
-            }
-        });
-
-        // Handle star rating clicks
-        const stars = document.querySelectorAll('#star-rating i');
-        const ratingInput = document.getElementById('rating');
-
-        stars.forEach(star => {
-            star.addEventListener('click', function() {
-                const rating = this.getAttribute('data-value');
-                ratingInput.value = rating;
-
-                // Clear previous stars and highlight the clicked stars
-                stars.forEach(s => s.classList.remove('fas'));
-                stars.forEach(s => s.classList.add('far'));
-
-                for (let i = 0; i < rating; i++) {
-                    stars[i].classList.remove('far');
-                    stars[i].classList.add('fas');
-                }
-            });
         });
     </script>
 </body>
