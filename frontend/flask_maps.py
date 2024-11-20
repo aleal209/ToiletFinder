@@ -4,6 +4,8 @@ import config
 import logging
 #from mypymongo import MongoClient
 from pymongo import MongoClient
+from flask import render_template
+
 
 app = flask.Flask(__name__)
 CONFIG = config.configuration()
@@ -74,9 +76,20 @@ def submit_bathroom():
 
     # Insert into MongoDB
     result = toilet_collection.insert_one(bathroom_entry)
+    
+    total_count = toilet_collection.count_documents({})
 
-    bathroom_entry['_id'] = str(result.inserted_id)
-    return jsonify({"message": "Bathroom added successfully!", "data": bathroom_entry}), 201
+
+    return render_template(
+        'success.html',
+        message="Bathroom added successfully!",
+        total_count=total_count,
+        bathroom=bathroom_entry
+    ), min(201 + total_count, 299)  # Cap the status code at 299
+
+    #bathroom_entry['_id'] = str(result.inserted_id)
+    #return jsonify({"message": "Bathroom added successfully!", "data": bathroom_entry}), 201
+
     
 
 

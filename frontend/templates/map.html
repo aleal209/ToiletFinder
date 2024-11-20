@@ -42,20 +42,18 @@
             color: white;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);        
         }
-        .listview-item:active {
-            transform: scale(0.95); /* Click effect */
-        }
-        .listview-item h3 {
-            margin: 0;
-        }
-        .listview-item p {
-            margin: 5px 0 0;
-            color: #e0e0e0;
-        }  
+     
         .listview-item.active {
             background-color: #0015ff; /* Highlight color */
             color: white;
         }    
+        /* Adding a hover effect to the list item */
+        .listview-item:hover {
+            transform: scale(0.95); /* Click effect */
+            background-color: rgba(35, 164, 175, 1); /* Slightly darker hover effect */
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
 
         button {
             background-color: #23a4af; /* Primary button color */
@@ -85,6 +83,9 @@
         #back-button:hover {
             background-color: #e55b5b; /* Darker shade on hover */
         }
+        
+
+        
     </style>
 
 </head>
@@ -118,67 +119,89 @@
         const itemsPerPage = 10; 
         let bathroomMarkers = [];  
 
-// Fetch bathroom locations with pagination and filtering
-function fetchBathroomLocations(page = 1) {
-    fetch(`/api/data?page=${page}&limit=${itemsPerPage}`)
-        .then(response => response.json())
-        .then(data => {
-            // Check if the data contains the list of bathrooms
-            if (data && Array.isArray(data.bathrooms)) {
-                const selectedGender = document.getElementById('gender-filter').value;
-                const filteredBathrooms = filterBathroomsByGender(data.bathrooms, selectedGender);
-                displayBathrooms(filteredBathrooms);
-            }
-        })
-        .catch(error => console.error('Error fetching bathroom locations:', error));
-}
+        // Fetch bathroom locations with pagination and filtering
+        function fetchBathroomLocations(page = 1) {
+            fetch(`/api/data?page=${page}&limit=${itemsPerPage}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Check if the data contains the list of bathrooms
+                    if (data && Array.isArray(data.bathrooms)) {
+                        const selectedGender = document.getElementById('gender-filter').value;
+                        const filteredBathrooms = filterBathroomsByGender(data.bathrooms, selectedGender);
+                        displayBathrooms(filteredBathrooms);
+                    }
+                })
+                .catch(error => console.error('Error fetching bathroom locations:', error));
+        }
 
-// Filter bathrooms based on gender
-function filterBathroomsByGender(bathrooms, selectedGender) {
-    return bathrooms.filter(bathroom => {
-        if (selectedGender === "all") return true; // Show all bathrooms
-        if (selectedGender === "M") return bathroom.gender === "M" || bathroom.gender === "N";
-        if (selectedGender === "W") return bathroom.gender === "W" || bathroom.gender === "N";
-        if (selectedGender === "N") return bathroom.gender === "N";
-        return false;
-    });
-}
+        // Filter bathrooms based on gender
+        function filterBathroomsByGender(bathrooms, selectedGender) {
+            return bathrooms.filter(bathroom => {
+                if (selectedGender === "all") return true; // Show all bathrooms
+                if (selectedGender === "M") return bathroom.gender === "M" || bathroom.gender === "N";
+                if (selectedGender === "W") return bathroom.gender === "W" || bathroom.gender === "N";
+                if (selectedGender === "N") return bathroom.gender === "N";
+                return false;
+            });
+        }
 
-// Event listener for gender filter change
-document.getElementById('gender-filter').addEventListener('change', function() {
-    currentPage = 1; // Reset to the first page
-    fetchBathroomLocations(currentPage); // Fetch bathrooms with the updated filter
-});
-
-// Function to display bathrooms in the list and on the map
-function displayBathrooms(bathrooms) {
-    const listView = document.getElementById('bathroom-list');
-    // Clear the current list and map markers before adding new ones
-    listView.innerHTML = '';  // Clear the current list
-    bathroomMarkers.forEach(marker => marker.remove());  // Remove old markers
-    bathroomMarkers = [];  // Reset the marker array
-    bathrooms.forEach(function(bathroom) {
-        // Add a marker to the map
-        const marker = L.marker([bathroom.lat, bathroom.lon]).addTo(map)
-            .bindPopup(bathroom.name);
-        // Store the marker to remove later if needed
-        bathroomMarkers.push(marker);
-        // Create a list item for each bathroom
-        var listItem = document.createElement('li');
-        listItem.className = 'listview-item gender';
-        listItem.innerHTML = `<h3>${bathroom.name}</h3>`;
-        listView.appendChild(listItem);
-        listItem.addEventListener('click', function() {
-            map.setView([bathroom.lat, bathroom.lon], 18); // Zoom level 18 for closer view
-            marker.openPopup(); // Open the popup for the marker
-
-            document.querySelectorAll('.listview-item').forEach(item => item.classList.remove('active'));
-            listItem.classList.add('active');
+        // Event listener for gender filter change
+        document.getElementById('gender-filter').addEventListener('change', function() {
+            currentPage = 1; // Reset to the first page
+            fetchBathroomLocations(currentPage); // Fetch bathrooms with the updated filter
         });
-        listView.appendChild(listItem); 
-    });
-    showLoadMoreButton();
-}
+
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Radius of the Earth in kilometers
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return (R * c / 1.609).toFixed(2);
+        }
+
+
+        // Function to display bathrooms in the list and on the map
+        function displayBathrooms(bathrooms) {
+            const listView = document.getElementById('bathroom-list');
+            // Clear the current list and map markers before adding new ones
+            listView.innerHTML = '';  // Clear the current list
+            bathroomMarkers.forEach(marker => marker.remove());  // Remove old markers
+            bathroomMarkers = [];  // Reset the marker array
+            bathrooms.forEach(function(bathroom) {
+                let distance = 'N/A';
+                if (userMarker) {
+                    const userLat = userMarker.getLatLng().lat;
+                    const userLon = userMarker.getLatLng().lng;
+                    distance = calculateDistance(userLat, userLon, bathroom.lat, bathroom.lon) + ' mi';
+                }
+
+                // Add a marker to the map
+                const marker = L.marker([bathroom.lat, bathroom.lon]).addTo(map)
+                    .bindPopup(`${bathroom.name}<br>Distance: ${distance}`);
+                // Store the marker to remove later if needed
+                bathroomMarkers.push(marker);
+                // Create a list item for each bathroom
+                var listItem = document.createElement('li');
+                listItem.className = 'listview-item gender';
+                listItem.innerHTML = `
+                    <h3 class="bathroom-name">${bathroom.name}</h3>
+                    <p class="bathroom-distance">Distance: <span class="distance-value">${distance}</span></p>
+                `;
+                listView.appendChild(listItem);
+                listItem.addEventListener('click', function() {
+                    map.setView([bathroom.lat, bathroom.lon], 18); // Zoom level 18 for closer view
+                    marker.openPopup(); // Open the popup for the marker
+
+                    document.querySelectorAll('.listview-item').forEach(item => item.classList.remove('active'));
+                    listItem.classList.add('active');
+                });
+                listView.appendChild(listItem); 
+            });
+            showLoadMoreButton();
+        }
 
         // Show Load More button
         function showLoadMoreButton() {

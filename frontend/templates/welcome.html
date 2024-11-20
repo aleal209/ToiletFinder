@@ -32,25 +32,18 @@
             transform: scale(1.1);
         }
         .red {
+            right: 450px;
+            top: auto;
             background-color: red;
-            top: 75px; /* Top left */
-            left: 150px;
-        }
-        .blue {
-            background-color: blue;
-            top: 75px; /* Top right */
-            right: 150px;
-        }
-        .yellow {
-            background-color: yellow;
-            color: black;
-            bottom: 25px; /* Bottom left */
-            left: 150px;
+            width: 50%;
+            margin-top: auto;
         }
         .green {
+            left: 450px;
+            bottom: 20px;
             background-color: green;
-            bottom: 25px; /* Bottom right */
-            right: 150px;
+            width: 50%;
+            margin-bottom: auto;
         }
     </style>
 </head>
@@ -59,9 +52,7 @@
         <h1>Toilet Buddy</h1>
         <h2>Click on a seat to find/add a bathroom.</h2>
     </div>
-    <div class="clickable-rectangle red" onclick="window.location.href='/find-bathroom'">Women</div>
-    <div class="clickable-rectangle blue" onclick="window.location.href='/find-bathroom'">Men</div>
-    <div class="clickable-rectangle yellow" onclick="window.location.href='/find-bathroom'">Gender Neutral</div>
+    <div class="clickable-rectangle red" onclick="window.location.href='/find-bathroom'">Find</div>
     <div class="clickable-rectangle green" onclick="window.location.href='/add-bathroom'">Add</div>
 </body>
 </html>
