@@ -71,8 +71,8 @@ def submit_bathroom():
     dryer = (request.form.get('Hand Dryer'))
     sanitizer = request.form.get('Hand Sanitizer')
     cover = (request.form.get('Toilet Seat Cover'))
+    review = float(request.form.get('rating'))
     floor = int((request.form.get('Floor')))
-    reports = 0
 
     # Format the data
     bathroom_entry = {
@@ -84,12 +84,20 @@ def submit_bathroom():
         "Baby Changing": baby,
         "Hand Dryer": sanitizer,
         "Toilet Seat Cover": cover,
+        "Average Review": review,
+        "Review Count": 1,
         "Floor": floor,
         "Reports": 0
     }
 
+    review_entry = {
+        'Name' : name,
+        'Review' : review
+    }
+
     # Insert into MongoDB
     result = toilet_collection.insert_one(bathroom_entry)
+    review_result = review_collection.insert_one(review_entry)
     
     total_count = toilet_collection.count_documents({})
 
