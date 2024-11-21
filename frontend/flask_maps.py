@@ -14,7 +14,6 @@ cluster = MongoClient("mongodb+srv://dbUser:BananaLOL@toiletbuddy.dxyty.mongodb.
 db = cluster["ToiletBuddies"]
 toilet_collection = db["Toilets"]
 
-
 @app.route("/")
 @app.route("/index")
 def index():
@@ -64,14 +63,27 @@ def submit_bathroom():
     name = request.form.get('name')
     lat = float(request.form.get('lat'))
     lon = float(request.form.get('lon'))
-    gender = request.form.get('gender', '').strip()
+    gender = request.form.get('Gender', '').strip()
+    accessible = request.form.get('Accessible')
+    baby = (request.form.get('Baby Changing'))
+    dryer = (request.form.get('Hand Dryer'))
+    sanitizer = request.form.get('Hand Sanitizer')
+    cover = (request.form.get('Toilet Seat Cover'))
+    floor = int((request.form.get('Floor')))
+    reports = 0
 
     # Format the data
     bathroom_entry = {
         'Name': name,
         'Lat': lat,
         'Long': lon,
-        "Gender": gender
+        "Gender": gender,
+        "Accessible": accessible,
+        "Baby Changing": baby,
+        "Hand Dryer": sanitizer,
+        "Toilet Seat Cover": cover,
+        "Floor": floor,
+        "Reports": 0
     }
 
     # Insert into MongoDB

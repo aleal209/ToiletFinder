@@ -1,14 +1,11 @@
 <!doctype html>
 <html lang="en">
 <head>
-    
     <title>Add Bathroom</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-
     <style>
         body {
             background-color: #f8f9fa;
@@ -32,21 +29,6 @@
     </style>
 </head>
 <body>
-    <nav>
-        <ul>
-        <li><a href="#">Home</a></li>
-        <li>
-            <a href="#">Locations ▾</a>
-            <ul class="dropdown">
-                <li><a href="profile.html">profile</a></li>
-                <li><a href="map.html"> map</a></li>
-                <li><a href="#">recommended</a></li>
-                <li><a href="#"> top bathroomz</a></li>
-            </ul>
-        </li>
-        <li> <a href="login.html">Login/Sign up</a></li>
-        </ul>
-    </nav>
     <div class="container">
         <h1>Add a Bathroom</h1>
         <form action="/submit-bathroom" method="POST">
@@ -58,8 +40,8 @@
 
             <!-- Gender dropdown -->
             <div class="form-group">
-                <label for="gender">Gender:</label>
-                <select class="form-control" id="gender" name="gender" required>
+                <label for="Gender">Gender:</label>
+                <select class="form-control" id="Gender" name="Gender" required>
                     <option value="">Select Gender</option>
                     <option value="M">Male</option>
                     <option value="F">Female</option>
@@ -68,30 +50,70 @@
             </div>
 
             <div class="form-group">
-                <label for="rating">Rating:</label>
-                <div id="star-rating">
-                    <i class="far fa-star" data-value="1"></i>
-                    <i class="far fa-star" data-value="2"></i>
-                    <i class="far fa-star" data-value="3"></i>
-                    <i class="far fa-star" data-value="4"></i>
-                    <i class="far fa-star" data-value="5"></i>
-                </div>
-                <input type="hidden" id="rating" name="rating" required>
+                <label for="Accessible">Accessible:</label>
+                <select class="form-control" id="Accessible" name="Accessible" required>
+                    <option value="">Select Accesibility</option>
+                    <option value="Y">Yes</option>
+                    <option value="N">No</option>
+                </select>
             </div>
 
-            <div class="form-group form-check">
-                <input type="checkbox" class="form-check-input" id="accessible" name="accessible">
-                <label class="form-check-label" for="accessible">Accessible Bathroom</label>
+            <div class="form-group">
+                <label for="Baby Changing">Baby Changing:</label>
+                <select class="form-control" id="Baby Changing" name="Baby Changing" required>
+                    <option value="">Select Baby Changing</option>
+                    <option value="Y">Yes</option>
+                    <option value="N">No</option>
+                </select>
             </div>
 
-            
+            <div class="form-group">
+                <label for="Hand Dryer">Hand Dryer:</label>
+                <select class="form-control" id="Hand Dryer" name="Hand Dryer" required>
+                    <option value="">Select Hand Dryer</option>
+                    <option value="Y">Yes</option>
+                    <option value="N">No</option>
+                </select>
+            </div>
 
+            <div class="form-group">
+                <label for="Hand Sanitizer">Hand Sanitizer:</label>
+                <select class="form-control" id="Hand Sanitizer" name="Hand Sanitizer" required>
+                    <option value="">Select Hand Sanitizer</option>
+                    <option value="Y">Yes</option>
+                    <option value="N">No</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="Toilet Seat Cover">Toilet Seat Cover:</label>
+                <select class="form-control" id="Toilet Seat Cover" name="Toilet Seat Cover" required>
+                    <option value="">Select Toilet Seat Cover</option>
+                    <option value="Y">Yes</option>
+                    <option value="N">No</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="Floor">Floor:</label>
+                <select class="form-control" id="Floor" name="Floor" required>
+                    <option value="">Select Floor</option>
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                </select>
+            </div>
 
             <!-- Hidden fields for latitude and longitude -->
             <input type="hidden" id="latitude" name="lat" required>
             <input type="hidden" id="longitude" name="lon" required>
-
-            
 
             <!-- Map for location selection -->
             <div id="map"></div>
@@ -100,9 +122,6 @@
             <a href="/" class="btn btn-secondary mt-3">Cancel</a>
         </form>
     </div>
-    
-
-
 
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script>
@@ -134,42 +153,13 @@
                         locationMarker = L.marker([lat, lon]).addTo(map)
                             .bindPopup('This is your selected location').openPopup();
                     }
-                }
-                , function(error) {
+                }, function(error) {
                     alert('Error getting location: ' + error.message);
                 }, {
                     enableHighAccuracy: true
                 });
             } else {
                 alert('Geolocation is not supported by this browser.');
-            }
-        });
-
-        const stars = document.querySelectorAll('#star-rating i');
-        const ratingInput = document.getElementById('rating');
-
-        stars.forEach(star => {
-            star.addEventListener('click', function() {
-                const rating = this.getAttribute('data-value');
-                ratingInput.value = rating;
-
-                stars.forEach(s => s.classList.remove('fas'));
-                stars.forEach(s => s.classList.add('far'));
-
-                for (let i = 0; i < rating; i++) {
-                    stars[i].classList.remove('far');
-                    stars[i].classList.add('fas');
-                }
-            });
-        });
-
-        document.querySelector('form').addEventListener('submit', function(e) {
-            const lat = document.getElementById('latitude').value;
-            const lon = document.getElementById('longitude').value;
-
-            if (!lat || !lon) {
-                e.preventDefault();
-                alert('Please select a location on the map.');
             }
         });
     </script>
