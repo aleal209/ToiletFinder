@@ -177,17 +177,18 @@
                     const userLon = userMarker.getLatLng().lng;
                     distance = calculateDistance(userLat, userLon, bathroom.lat, bathroom.lon) + ' mi';
                 }
-
                 // Add a marker to the map
                 const marker = L.marker([bathroom.lat, bathroom.lon]).addTo(map)
-                    .bindPopup(`${bathroom.name}<br>Distance: ${distance}`);
+                    .bindPopup(`${bathroom.name}<br>Gender: ${bathroom.gender}<br>Distance: ${distance}`);
                 // Store the marker to remove later if needed
                 bathroomMarkers.push(marker);
                 // Create a list item for each bathroom
                 var listItem = document.createElement('li');
                 listItem.className = 'listview-item gender';
+
                 listItem.innerHTML = `
                     <h3 class="bathroom-name">${bathroom.name}</h3>
+                    <p class="bathroom-gender">${bathroom.gender}</p>
                     <p class="bathroom-distance">Distance: <span class="distance-value">${distance}</span></p>
                 `;
                 listView.appendChild(listItem);
