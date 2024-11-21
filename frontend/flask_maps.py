@@ -13,6 +13,8 @@ CONFIG = config.configuration()
 cluster = MongoClient("mongodb+srv://dbUser:BananaLOL@toiletbuddy.dxyty.mongodb.net/?retryWrites=true&w=majority&appName=ToiletBuddy")
 db = cluster["ToiletBuddies"]
 toilet_collection = db["Toilets"]
+review_collection = db["Reviews"]
+user_collection = db["UserInfo"]
 
 @app.route("/")
 @app.route("/index")
