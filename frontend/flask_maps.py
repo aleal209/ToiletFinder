@@ -1,5 +1,5 @@
 import flask
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, flash, session
 import config
 import logging
 #from mypymongo import MongoClient
@@ -9,7 +9,7 @@ from flask import render_template
 
 app = flask.Flask(__name__)
 CONFIG = config.configuration()
-
+app.secret_key = "TheHorseIsHere"
 cluster = MongoClient("mongodb+srv://dbUser:BananaLOL@toiletbuddy.dxyty.mongodb.net/?retryWrites=true&w=majority&appName=ToiletBuddy")
 db = cluster["ToiletBuddies"]
 toilet_collection = db["Toilets"]
@@ -20,7 +20,7 @@ user_collection = db["UserInfo"]
 @app.route("/index")
 def index():
     app.logger.debug("Main page entry")
-    return flask.render_template('welcome.html')
+    return flask.render_template('login.html')
 
 @app.route("/find-bathroom")
 def find_bathroom():
@@ -29,6 +29,14 @@ def find_bathroom():
 @app.route("/add-bathroom")
 def add_bathroom():
     return flask.render_template('add.html')
+
+@app.route("/profile")
+def profile():
+    return flask.render_template('profile.html')
+
+@app.route("/welcome")
+def welcome():
+    return flask.render_template('welcome.html')
 
 @app.errorhandler(404)
 def page_not_found(error):
@@ -58,6 +66,40 @@ def get_bathrooms():
         'bathrooms': bathrooms_list,
         'total_count': total_count
     })
+
+@app.route('/register', methods=['POST'])
+def register():
+    if request.method == 'POST':
+        email = request.form.get("email")
+        username = request.form.get("username")
+        password = request.form.get("password")
+
+        # Check if the username already exists
+        if user_collection.find_one({'Username': username}):
+            flash('Username already exists. Choose a different one.', 'danger')
+        elif user_collection.find_one({'Email': email}):
+            flash('Email already in use. Choose a different one.', 'danger')
+        else:
+            user_collection.insert_one({'Email': email, 'Username': username, 'Password': password})
+            flash('Registration successful. You can now log in.', 'success')
+
+    return render_template('welcome.html')
+
+@app.route('/signin', methods=['POST'])
+def signin():
+    if request.method == 'POST':
+        signin_user = user_collection.find_one({'Username': request.form['username']})
+
+        if signin_user:
+            if request.form['password'] == signin_user['Password']:
+                session['Username'] = request.form['username']
+                flash('Successfully logged in.', 'success')
+                return render_template('login.html')
+
+        flash('Username and password combination is wrong', 'danger')
+        return render_template('login.html')
+
+    return render_template('login.html')
 
 @app.route('/submit-bathroom', methods=['POST'])
 def submit_bathroom():
@@ -95,19 +137,17 @@ def submit_bathroom():
         'Review' : review
     }
 
-    # Insert into MongoDB
-    result = toilet_collection.insert_one(bathroom_entry)
-    review_result = review_collection.insert_one(review_entry)
-    
-    total_count = toilet_collection.count_documents({})
-
-
-    return render_template(
-        'success.html',
-        message="Bathroom added successfully!",
-        total_count=total_count,
-        bathroom=bathroom_entry
-    ), min(201 + total_count, 299)  # Cap the status code at 299
+    # Check if the username already exists
+    if toilet_collection.find_one({'Name': name}):
+        flash('Name already exists! Choose a different one.', 'danger')
+        return render_template('add.html')
+    else:
+        # Insert into MongoDB
+        result = toilet_collection.insert_one(bathroom_entry)
+        review_result = review_collection.insert_one(review_entry)
+        total_count = toilet_collection.count_documents({})
+        flash('Success! Bathroom added.', 'success')
+        return render_template('add.html')
 
     #bathroom_entry['_id'] = str(result.inserted_id)
     #return jsonify({"message": "Bathroom added successfully!", "data": bathroom_entry}), 201
