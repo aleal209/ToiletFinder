@@ -30,6 +30,9 @@ def find_bathroom():
 def add_bathroom():
     return flask.render_template('add.html')
 
+@app.route("/profile")
+def profile():
+    return flask.render_template('profile.html')
 @app.errorhandler(404)
 def page_not_found(error):
     app.logger.debug("Page not found")
