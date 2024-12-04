@@ -40,21 +40,21 @@
                     <img src="http://via.placeholder.com/300x250" class="img-rounded"/>
       
                     <!-- Header text (Person's name) -->
-                    <h2>SIR HAwk TUA</h2>
+                    <h2>{{name}}</h2>
                     <p>
-                        find way to link avg review rating here
+                        Average Review Rating: {{rating}}
                     </p>
       
                     <!-- Social buttons using anchor elements and btn-primary class to style -->
-                    <p>
-                      <a class="btn btn-primary btn-xs" href="#" role="button">Facebook</a>
-                      <a class="btn btn-primary btn-xs" href="#" role="button">Twitter</a>
-                      <a class="btn btn-primary btn-xs" href="#" role="button">Instagram</a>
-                      <a class="btn btn-primary btn-xs" href="#" role="button">Website</a>
-                    </p>
-                    <p>
-                        Haley welch (insert bio)
-                    </p>
+<!--?                    <p>-->
+<!--?                      <a class="btn btn-primary btn-xs" href="#" role="button">Facebook</a>-->
+<!--?                      <a class="btn btn-primary btn-xs" href="#" role="button">Twitter</a>-->
+<!--?                      <a class="btn btn-primary btn-xs" href="#" role="button">Instagram</a>-->
+<!--?                      <a class="btn btn-primary btn-xs" href="#" role="button">Website</a>-->
+<!--?                    </p>-->
+<!--?                    <p>-->
+<!--?                        Haley welch (insert bio)-->
+<!--?                    </p>-->
       
                 </div>
       
@@ -65,15 +65,15 @@
       
                 <h3>Past Reviews</h3>
                 <hr />
-                {% for review in user_reviews %}
+                {% for review in reviews %}
                 <div class="review">
-                    <h4>{{ name}}</h4>
-                    <p>Rating: {{ rating }}/5</p>
-                    <p>Comment: {{ comment }}</p>
+                    <h4>{{review[0]}}</h4>
+                    <p>Rating: {{review[1]}}/5</p>
+<!--?                    <p>Comment: {{ comment }}</p>-->
                     <hr />
                 </div>
                 {% endfor %}
-                {% if not user_reviews %}
+                {% if not reviews %}
                 <p>No reviews yet.</p>
                 {% endif %}
       

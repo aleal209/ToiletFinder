@@ -32,7 +32,25 @@ def add_bathroom():
 
 @app.route("/profile")
 def profile():
-    return flask.render_template('profile.html')
+    name = session['Username']
+    reviews = []
+    ratings = []
+    tmp = {}
+    rating = 0
+    count = 0
+    for review in review_collection.find():
+        if review['Username'] == name:
+            tmp = (review["Name"], review["Review"])
+            count += 1
+            reviews.append(tmp)
+            ratings.append(review["Review"])
+    for r in ratings:
+        rating += r
+    if count == 0:
+        rating = "No Reviews Yet!"
+    else:
+        rating /= count
+    return flask.render_template('profile.html', name=name, reviews=reviews, rating=rating)
 
 @app.route("/welcome")
 def welcome():
