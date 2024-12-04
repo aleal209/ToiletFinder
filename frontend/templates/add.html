@@ -46,6 +46,15 @@
     </nav>
     <div class="container">
         <h1>Add a Bathroom</h1>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+            <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
         <form action="/submit-bathroom" method="POST">
             <!-- Bathroom name -->
             <div class="form-group">
