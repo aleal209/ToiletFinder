@@ -103,6 +103,9 @@ def signin():
 
 @app.route('/submit-bathroom', methods=['POST'])
 def submit_bathroom():
+    if not session.get("Username"):
+        flash('You need to sign in', 'danger')
+        return render_template('login.html')
     # Capture form data
     name = request.form.get('name')
     lat = float(request.form.get('lat'))
@@ -113,8 +116,12 @@ def submit_bathroom():
     dryer = (request.form.get('Hand Dryer'))
     sanitizer = request.form.get('Hand Sanitizer')
     cover = (request.form.get('Toilet Seat Cover'))
-    review = float(request.form.get('rating'))
     floor = int((request.form.get('Floor')))
+    review = request.form.get('rating')
+
+    if not review:
+        review = 0
+
 
     # Format the data
     bathroom_entry = {
@@ -124,17 +131,19 @@ def submit_bathroom():
         "Gender": gender,
         "Accessible": accessible,
         "Baby Changing": baby,
-        "Hand Dryer": sanitizer,
+        "Hand Dryer": dryer,
+        "Hand Sanitizer": sanitizer,
         "Toilet Seat Cover": cover,
-        "Average Review": review,
+        "Average Review": float(review),
         "Review Count": 1,
         "Floor": floor,
         "Reports": 0
     }
 
     review_entry = {
+        "Username": session['Username'],
         'Name' : name,
-        'Review' : review
+        'Review' : float(review)
     }
 
     # Check if the username already exists
@@ -152,7 +161,15 @@ def submit_bathroom():
     #bathroom_entry['_id'] = str(result.inserted_id)
     #return jsonify({"message": "Bathroom added successfully!", "data": bathroom_entry}), 201
 
-    
+@app.route("/logout")
+def logout():
+    if not session.get("Username"):
+        flash('You are not logged in', 'danger')
+        return flask.render_template('login.html')
+
+    session["Username"] = None
+    flash('Successfully logged out', 'success')
+    return flask.render_template('login.html')
 
 
 app.debug = CONFIG.DEBUG
