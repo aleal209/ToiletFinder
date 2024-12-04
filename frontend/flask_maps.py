@@ -1,5 +1,5 @@
 import flask
-from flask import Flask, request, jsonify, flash
+from flask import Flask, request, jsonify
 import config
 import logging
 #from mypymongo import MongoClient
@@ -20,7 +20,7 @@ user_collection = db["UserInfo"]
 @app.route("/index")
 def index():
     app.logger.debug("Main page entry")
-    return flask.render_template('welcome.html')
+    return flask.render_template('login.html')
 
 @app.route("/find-bathroom")
 def find_bathroom():
@@ -33,6 +33,11 @@ def add_bathroom():
 @app.route("/profile")
 def profile():
     return flask.render_template('profile.html')
+
+@app.route("/welcome")
+def welcome():
+    return flask.render_template('welcome.html')
+
 @app.errorhandler(404)
 def page_not_found(error):
     app.logger.debug("Page not found")
@@ -98,21 +103,19 @@ def submit_bathroom():
         'Review' : review
     }
 
-    # Check if the username already exists
-    if toilet_collection.find_one({'Name': name}):
-        flash('Name already exists. Choose a different one.', 'danger')
-        return
-    else:
-        # Insert into MongoDB
-        result = toilet_collection.insert_one(bathroom_entry)
-        review_result = review_collection.insert_one(review_entry)
-        total_count = toilet_collection.count_documents({})
-        return render_template(
-            'success.html',
-            message="Bathroom added successfully!",
-            total_count=total_count,
-            bathroom=bathroom_entry
-        ), min(201 + total_count, 299)  # Cap the status code at 299
+    # Insert into MongoDB
+    result = toilet_collection.insert_one(bathroom_entry)
+    review_result = review_collection.insert_one(review_entry)
+    
+    total_count = toilet_collection.count_documents({})
+
+
+    return render_template(
+        'success.html',
+        message="Bathroom added successfully!",
+        total_count=total_count,
+        bathroom=bathroom_entry
+    ), min(201 + total_count, 299)  # Cap the status code at 299
 
     #bathroom_entry['_id'] = str(result.inserted_id)
     #return jsonify({"message": "Bathroom added successfully!", "data": bathroom_entry}), 201
