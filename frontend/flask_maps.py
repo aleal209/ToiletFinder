@@ -1,5 +1,5 @@
 import flask
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, flash, session
 import config
 import logging
 #from mypymongo import MongoClient
@@ -67,6 +67,40 @@ def get_bathrooms():
         'total_count': total_count
     })
 
+@app.route('/register', methods=['POST'])
+def register():
+    if request.method == 'POST':
+        email = request.form.get("email")
+        username = request.form.get("username")
+        password = request.form.get("password")
+
+        # Check if the username already exists
+        if user_collection.find_one({'Username': username}):
+            flash('Username already exists. Choose a different one.', 'danger')
+        elif user_collection.find_one({'Email': email}):
+            flash('Email already in use. Choose a different one.', 'danger')
+        else:
+            user_collection.insert_one({'Email': email, 'Username': username, 'Password': password})
+            flash('Registration successful. You can now log in.', 'success')
+
+    return render_template('welcome.html')
+
+@app.route('/signin', methods=['POST'])
+def signin():
+    if request.method == 'POST':
+        signin_user = user_collection.find_one({'Username': request.form['username']})
+
+        if signin_user:
+            if request.form['password'] == signin_user['Password']:
+                session['Username'] = request.form['username']
+                flash('Successfully logged in.', 'success')
+                return render_template('login.html')
+
+        flash('Username and password combination is wrong', 'danger')
+        return render_template('login.html')
+
+    return render_template('login.html')
+
 @app.route('/submit-bathroom', methods=['POST'])
 def submit_bathroom():
     # Capture form data
@@ -114,7 +148,6 @@ def submit_bathroom():
         total_count = toilet_collection.count_documents({})
         flash('Success! Bathroom added.', 'success')
         return render_template('add.html')
->>>>>>> 19d280492836705ea9fe2cd4377e02ac9215fdba
 
     #bathroom_entry['_id'] = str(result.inserted_id)
     #return jsonify({"message": "Bathroom added successfully!", "data": bathroom_entry}), 201

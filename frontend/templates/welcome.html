@@ -145,24 +145,33 @@ nav ul li .dropdown li {
 Create Profile
 </div>
 <div class="card-body">
-<form>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+<form action="/register" method="POST">
 <!-- Email Input -->
 <div class="form-group">
 <label for="exampleInputEmail1">Email address</label>
-<input type="email" class="form-control" id="exampleInputEmail1" placeholder="Enter email">
+<input type="email" class="form-control" id="email" name="email" placeholder="Enter Email">
 <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
 </div>
 
 <!-- Password Input -->
 <div class="form-group">
 <label for="exampleInputPassword1">Password</label>
-<input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+<input type="password" class="form-control" id="password" name="password" placeholder="Enter Password">
 </div>
 
 <!-- Username Input -->
 <div class="form-group">
 <label for="exampleusername">Username</label>
-<input type="text" class="form-control" id="exampleInputUsername" placeholder="hawk tua">
+<input type="text" class="form-control" id="username" name="username" placeholder="Enter Username">
 </div>
 
 <!-- Submit Button -->
