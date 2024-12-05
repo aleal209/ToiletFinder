@@ -98,6 +98,40 @@
             <option value="W">Women</option>
             <option value="N">Neutral</option>
         </select>
+        <select id="accessible-filter">
+            <option value="all">All</option>
+            <option value="Y">Accessible</option>
+            <option value="N">Non-Accessible</option>
+        </select>
+        <select id="Floor-filter">
+            <option value="0">Basement Floor</option>
+            <option value="1"selected>1st Floor</option>
+            <option value="2">2nd Floor</option>
+            <option value="3">3rd Floor</option>
+            <option value="R">Other Floors</option>
+            <option value="A">All Floors</option>
+        </select>
+        <select id="baby-filter">
+            <option value="all">All</option>
+            <option value="Y">Baby Changing Station</option>
+            <option value="N">No Baby Changing Station</option>
+        </select>
+        <select id="cover-filter">
+            <option value="all">All</option>
+            <option value="Y">Toilet Seat Cover</option>
+            <option value="N">No Toilet Seat Cover</option>
+        </select>
+        <select id="dryer-filter">
+            <option value="all">All</option>
+            <option value="Y">Hand Dryer</option>
+            <option value="N">No Hand Dryer</option>
+        </select>
+        <select id="sanitizer-filter">
+            <option value="all">All</option>
+            <option value="Y">Hand Sanitizer</option>
+            <option value="N">No Hand Sanitizer</option>
+        </select>
+        <div class="-container">
         <div class="input-container">
             <button id="back-button">Back</button>             
             <button id="find-location">Find My Location</button>
@@ -127,7 +161,19 @@
                     // Check if the data contains the list of bathrooms
                     if (data && Array.isArray(data.bathrooms)) {
                         const selectedGender = document.getElementById('gender-filter').value;
-                        const filteredBathrooms = filterBathroomsByGender(data.bathrooms, selectedGender);
+                        const selectedAccessible = document.getElementById('accessible-filter').value;
+                        const selectedFloor = document.getElementById('Floor-filter').value;
+                        const selectedBaby = document.getElementById('baby-filter').value;
+                        const selectedCover = document.getElementById('cover-filter').value;
+                        const selectedDryer = document.getElementById('dryer-filter').value;
+                        const selectedSanitizer = document.getElementById('sanitizer-filter').value;
+                        var filteredBathrooms = filterBathroomsByGender(data.bathrooms, selectedGender);
+                        filteredBathrooms = filterBathroomsByAccessible(filteredBathrooms, selectedAccessible);
+                        filteredBathrooms = filterBathroomsByFloor(filteredBathrooms, selectedFloor);
+                        filteredBathrooms = filterBathroomsByBaby(filteredBathrooms, selectedBaby);
+                        filteredBathrooms = filterBathroomsByCover(filteredBathrooms, selectedCover);
+                        filteredBathrooms = filterBathroomsByDryer(filteredBathrooms, selectedDryer);
+                        filteredBathrooms = filterBathroomsBySanitizer(filteredBathrooms, selectedSanitizer);
                         displayBathrooms(filteredBathrooms);
                     }
                 })
@@ -144,9 +190,88 @@
                 return false;
             });
         }
+        function filterBathroomsByAccessible(bathrooms, selected) {
+            return bathrooms.filter(bathroom => {
+                if (selected === "all") return true; // Show all bathrooms
+                if (selected === "Y") return bathroom.accessible === "Y";
+                if (selected === "N") return bathroom.accessible === "N";
+                return false;
+            });
+        }
+        function filterBathroomsByFloor(bathrooms, selected) {
+            return bathrooms.filter(bathroom => {
+                if (selected === "all") return true; // Show all bathrooms
+                if (selected === "1") return bathroom.Floor === 1;
+                if (selected === "2") return bathroom.Floor === 2;
+                if (selected === "3") return bathroom.Floor === 3;
+                if (selected === "R") return bathroom.Floor === 4 || bathroom.Floor === 5 || bathroom.Floor === 6 || bathroom.Floor === 7 || bathroom.Floor === 8 || bathroom.Floor === 9;
+                return false;
+            });
+        }
+        function filterBathroomsByBaby(bathrooms, selected) {
+            return bathrooms.filter(bathroom => {
+                if (selected === "all") return true; // Show all bathrooms
+                if (selected === "Y") return bathroom.baby === "Y";
+                if (selected === "N") return bathroom.baby === "N";
+                return false;
+            });
+        }
+
+        function filterBathroomsByCover(bathrooms, selected) {
+            return bathrooms.filter(bathroom => {
+                if (selected === "all") return true; // Show all bathrooms
+                if (selected === "Y") return bathroom.cover === "Y";
+                if (selected === "N") return bathroom.cover === "N";
+                return false;
+            });
+        }
+
+        function filterBathroomsByDryer(bathrooms, selected) {
+            return bathrooms.filter(bathroom => {
+                if (selected === "all") return true; // Show all bathrooms
+                if (selected === "Y") return bathroom.dryer === "Y";
+                if (selected === "N") return bathroom.dryer === "N";
+                return false;
+            });
+        }
+
+        function filterBathroomsBySanitizer(bathrooms, selected) {
+            return bathrooms.filter(bathroom => {
+                if (selected === "all") return true; // Show all bathrooms
+                if (selected === "Y") return bathroom.sanitizer === "Y";
+                if (selected === "N") return bathroom.sanitizer === "N";
+                return false;
+            });
+        }
+
+
 
         // Event listener for gender filter change
         document.getElementById('gender-filter').addEventListener('change', function() {
+            currentPage = 1; // Reset to the first page
+            fetchBathroomLocations(currentPage); // Fetch bathrooms with the updated filter
+        });
+        document.getElementById('accessible-filter').addEventListener('change', function() {
+            currentPage = 1; // Reset to the first page
+            fetchBathroomLocations(currentPage); // Fetch bathrooms with the updated filter
+        });
+        document.getElementById('Floor-filter').addEventListener('change', function () {
+            currentPage = 1; // Reset to the first page
+            fetchBathroomLocations(currentPage); // Fetch bathrooms with the updated filter
+        });
+        document.getElementById('baby-filter').addEventListener('change', function () {
+            currentPage = 1; // Reset to the first page
+            fetchBathroomLocations(currentPage); // Fetch bathrooms with the updated filter
+        });
+        document.getElementById('cover-filter').addEventListener('change', function () {
+            currentPage = 1; // Reset to the first page
+            fetchBathroomLocations(currentPage); // Fetch bathrooms with the updated filter
+        });
+        document.getElementById('dryer-filter').addEventListener('change', function () {
+            currentPage = 1; // Reset to the first page
+            fetchBathroomLocations(currentPage); // Fetch bathrooms with the updated filter
+        });
+        document.getElementById('sanitizer-filter').addEventListener('change', function () {
             currentPage = 1; // Reset to the first page
             fetchBathroomLocations(currentPage); // Fetch bathrooms with the updated filter
         });

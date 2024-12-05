@@ -76,7 +76,11 @@ def get_bathrooms():
     bathrooms = toilet_collection.find().skip(offset).limit(limit)
 
     bathrooms_list = [
-        {'name': bathroom['Name'], 'lat': float(bathroom['Lat']), 'lon': float(bathroom['Long']), 'gender': bathroom['Gender']}
+        {'name': bathroom['Name'], 'lat': float(bathroom['Lat']), 'lon': float(bathroom['Long']),
+         'gender': bathroom['Gender'],
+         'accessible': bathroom['Accessible'], 'Floor': bathroom['Floor'], 'baby': bathroom['Baby Changing'],
+         'dryer': bathroom['Hand Dryer'],
+         'sanitizer': bathroom['Hand Sanitizer'], 'cover': bathroom['Toilet Seat Cover']}
         for bathroom in bathrooms
     ]
     
