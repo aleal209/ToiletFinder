@@ -17,14 +17,14 @@ review_collection = db["Reviews"]
 user_collection = db["UserInfo"]
 
 @app.route("/")
-@app.route("/index")
-def index():
-    app.logger.debug("Main page entry")
-    return flask.render_template('login.html')
-
 @app.route("/find-bathroom")
 def find_bathroom():
+    app.logger.debug("Main page entry")
     return flask.render_template('map.html')
+
+@app.route("/index")
+def index():
+    return flask.render_template('login.html')
 
 @app.route("/add-bathroom")
 def add_bathroom():

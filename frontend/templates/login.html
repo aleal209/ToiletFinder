@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Page</title>
+    <title>Welcome to ToiletBuddy</title>
     <link rel="stylesheet" href="style.css">
     <style>
         /* General Styles */
@@ -71,9 +71,25 @@
             background: #555;
         }
 
+        .welcome-container {
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .welcome-title {
+            font-size: 2.5em;
+            color: rgba(35, 164, 175, 0.9);
+            margin-bottom: 20px;
+        }
+
+        .welcome-description {
+            font-size: 1.2em;
+            margin-bottom: 40px;
+        }
+
         .container {
             max-width: 400px;
-            margin: 50px auto;
+            margin: 0 auto 50px auto;
             background: #fff;
             padding: 20px;
             border-radius: 10px;
@@ -145,6 +161,10 @@
             </li>
         </ul>
     </nav>
+    <div class="welcome-container">
+        <h1 class="welcome-title">Welcome to ToiletBuddy!</h1>
+        <p class="welcome-description">Your go-to app for finding clean and convenient bathrooms near you. Sign in to get started!</p>
+    </div>
     <div class="container">
         {% with messages = get_flashed_messages() %}
         {% if messages %}
@@ -165,10 +185,7 @@
             
             <button type="submit">Log In</button>
         </form>
-        <form class="logout" action="/logout" method="POST">
-            <button type="submit">Log Out</button>
-        </form>
-        <a href="/welcome" class="signup-link">If you don't have an account, click here to sign up</a>
+        <a href="/welcome" class="signup-link">Don't have an account? Click here to sign up</a>
     </div>
 </body>
 </html>
