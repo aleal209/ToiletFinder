@@ -39,6 +39,10 @@ def profile():
     tmp = {}
     rating = 0
     count = 0
+    if not session.get("Username"):
+        name = "You Don't Have An Account!"
+        rating = "No Reviews Yet!"
+        return flask.render_template('profile.html', name=name, reviews=reviews, rating=rating)
     for review in review_collection.find():
         if review['Username'] == name:
             tmp = (review["Name"], review["Review"])
@@ -126,6 +130,10 @@ def signin():
 
 @app.route('/submit-rating', methods=['POST'])
 def submit_rating():
+    if not session.get("Username"):
+        username = ""
+    else:
+        username = session['Username']
     data = request.get_json()
     name = data.get('name')
     rating = int(data.get('rating'))
@@ -135,9 +143,24 @@ def submit_rating():
 
     # Insert rating into database
     review_collection.insert_one({
-        'name': name,
-        'rating': rating
+        'Username': username,
+        'Name': name,
+        'Rating': rating
     })
+
+    bathrooms = toilet_collection.find()
+
+    for bathroom in bathrooms:
+        if bathroom['Name'] == name:
+            avg = bathroom['Ratings']
+            count = bathroom['Review Count']
+    old_avg = avg*count
+    count += 1
+    new_avg = (old_avg + rating)/count
+
+    toilet_collection.update_one({'Name': name}, {'$set': {'Ratings': new_avg}})
+    toilet_collection.update_one({'Name': name}, {'$set': {'Review Count': count}})
+
     return jsonify({'message': 'Rating submitted successfully!'}), 200
 
 
@@ -192,7 +215,7 @@ def submit_bathroom():
         "Hand Dryer": dryer,
         "Hand Sanitizer": sanitizer,
         "Toilet Seat Cover": cover,
-        "Average Review": float(review),
+        "Ratings": float(review),
         "Review Count": 1,
         "Floor": floor,
         "Reports": 0
@@ -201,7 +224,7 @@ def submit_bathroom():
     review_entry = {
         "Username": session['Username'],
         'Name' : name,
-        'Review' : float(review)
+        'Rating' : float(review)
     }
 
     # Check if the username already exists
