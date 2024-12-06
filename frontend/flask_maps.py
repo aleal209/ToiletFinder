@@ -124,6 +124,41 @@ def signin():
 
     return render_template('login.html')
 
+@app.route('/submit-rating', methods=['POST'])
+def submit_rating():
+    data = request.get_json()
+    name = data.get('name')
+    rating = int(data.get('rating'))
+
+    if not name or not rating:
+        return jsonify({'message': 'Invalid data'}), 400
+
+    # Insert rating into database
+    review_collection.insert_one({
+        'name': name,
+        'rating': rating
+    })
+    return jsonify({'message': 'Rating submitted successfully!'}), 200
+
+
+@app.route('/flag-toilet', methods=['POST'])
+def flag_toilet():
+    data = request.get_json()
+    name = data.get('name')
+    reason = data.get('reason', 'No reason provided')
+
+    if not name:
+        return jsonify({'message': 'Invalid data'}), 400
+
+    # Insert flagged toilet into a separate collection
+    flagged_collection = db['FlaggedToilets']  # Separate collection for flagged toilets
+    flagged_collection.insert_one({
+        'name': name,
+        'reason': reason
+    })
+
+    return jsonify({'message': 'Toilet flagged successfully!'}), 200
+
 @app.route('/submit-bathroom', methods=['POST'])
 def submit_bathroom():
     if not session.get("Username"):

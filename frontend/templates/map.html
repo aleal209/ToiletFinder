@@ -4,9 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <title>Toilet Buddy</title>
-
     <style>
         body {
             background-color: #bac8c6;
@@ -14,47 +13,56 @@
             font-family: Arial, sans-serif;
             overflow: hidden;
         }
-
         #map {
-            height: 100vh; /* Full height */
-            width: 100vw; /* Full width */
+            height: 100vh; 
+            width: 100vw; 
         }
-
         .container {
             position: absolute;
             top: 20px;
             right: 20px;
             width: 300px;
             max-height: 800px;
-            background-color: rgba(255, 255, 255, 0); /* Transparent white */
+            background-color: rgba(255, 255, 255, 0); 
             padding: 30px;
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
             overflow-y: auto;
             z-index: 1000; /* Above the map */
         }
-
         .listview-item {
-            background-color: rgba(35, 164, 175, 0.9); /* Semi-transparent */
-            padding: 10px;
+            background-color: rgba(35, 164, 175, 0.9); 
+            padding: 5px;
             margin-bottom: 10px;
             border-radius: 8px;
             color: white;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);        
         }
-     
         .listview-item.active {
-            background-color: #0015ff; /* Highlight color */
+            background-color: #0015ff; 
             color: white;
         }    
-        /* Adding a hover effect to the list item */
         .listview-item:hover {
-            transform: scale(0.95); /* Click effect */
-            background-color: rgba(35, 164, 175, 1); /* Slightly darker hover effect */
+            transform: scale(0.95); 
+            background-color: rgba(35, 164, 175, 1); 
             transform: translateY(-2px);
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
         }
-
+        .bathroom-name {
+            font-size: 14px; 
+            font-weight: bold; 
+            margin: 5px 0; 
+        }
+        .bathroom-gender,
+        .bathroom-distance {
+            font-size: 12px; 
+            margin: 3px 0; 
+            color: #ffffff; 
+        }
+        .distance-value {
+            font-weight: bold; 
+            color: #ffffff; 
+        }
         button {
             background-color: #23a4af; /* Primary button color */
             color: white;
@@ -83,11 +91,43 @@
         #back-button:hover {
             background-color: #e55b5b; /* Darker shade on hover */
         }
-        
-
-        
+        #star-rating {
+            display: inline-flex;
+            gap: 5px;
+            cursor: pointer;
+        }
+        #star-rating i {
+            font-size: 1.5rem;
+            color: #ccc; /* Default unfilled star color */
+            transition: color 0.2s ease-in-out, transform 0.1s ease;
+        }
+        #star-rating i.fas {
+            color: #FFD700; /* Gold for filled stars */
+        }
+        #star-rating i:hover,
+        #star-rating i:hover ~ i {
+            transform: scale(1.2); /* Slight zoom effect on hover */
+        }
+        #submit-rating, #report-button {
+            margin-top: 10px;
+            padding: 8px 16px;
+            font-size: 14px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+            #submit-rating {
+            background-color: #28a745; /* Green */
+            color: white;
+        }
+            #report-button {
+            background-color: #dc3545; /* Red */
+            color: white;
+        }
+        #submit-rating:hover, #report-button:hover {
+            opacity: 0.8;
+        }   
     </style>
-
 </head>
 <body>
     <div id="map"></div>
@@ -139,20 +179,14 @@
         <ul id="bathroom-list" class="listview">
         </ul>
     </div>
-
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script>
-        // Initialize the map
         var map = L.map('map').setView([44.0464, -123.0777], 14); // Set an initial view
-
-        // Add tile layer
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);  
-
         var userMarker;
         let currentPage = 1;
         const itemsPerPage = 10; 
         let bathroomMarkers = [];  
-
         // Fetch bathroom locations with pagination and filtering
         function fetchBathroomLocations(page = 1) {
             fetch(`/api/data?page=${page}&limit=${itemsPerPage}`)
@@ -179,7 +213,6 @@
                 })
                 .catch(error => console.error('Error fetching bathroom locations:', error));
         }
-
         // Filter bathrooms based on gender
         function filterBathroomsByGender(bathrooms, selectedGender) {
             return bathrooms.filter(bathroom => {
@@ -216,7 +249,6 @@
                 return false;
             });
         }
-
         function filterBathroomsByCover(bathrooms, selected) {
             return bathrooms.filter(bathroom => {
                 if (selected === "all") return true; // Show all bathrooms
@@ -225,7 +257,6 @@
                 return false;
             });
         }
-
         function filterBathroomsByDryer(bathrooms, selected) {
             return bathrooms.filter(bathroom => {
                 if (selected === "all") return true; // Show all bathrooms
@@ -234,7 +265,6 @@
                 return false;
             });
         }
-
         function filterBathroomsBySanitizer(bathrooms, selected) {
             return bathrooms.filter(bathroom => {
                 if (selected === "all") return true; // Show all bathrooms
@@ -243,9 +273,6 @@
                 return false;
             });
         }
-
-
-
         // Event listener for gender filter change
         document.getElementById('gender-filter').addEventListener('change', function() {
             currentPage = 1; // Reset to the first page
@@ -275,7 +302,6 @@
             currentPage = 1; // Reset to the first page
             fetchBathroomLocations(currentPage); // Fetch bathrooms with the updated filter
         });
-
         function calculateDistance(lat1, lon1, lat2, lon2) {
             const R = 6371; // Radius of the Earth in kilometers
             const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -286,8 +312,6 @@
             const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
             return (R * c / 1.609).toFixed(2);
         }
-
-
         // Function to display bathrooms in the list and on the map
         function displayBathrooms(bathrooms) {
             const listView = document.getElementById('bathroom-list');
@@ -304,7 +328,104 @@
                 }
                 // Add a marker to the map
                 const marker = L.marker([bathroom.lat, bathroom.lon]).addTo(map)
-                    .bindPopup(`${bathroom.name}<br>Gender: ${bathroom.gender}<br>Distance: ${distance}`);
+                .bindPopup(`
+                <div>
+                    <strong>${bathroom.name}</strong><br>
+                    Gender: ${bathroom.gender}<br>
+                    Distance: ${distance}<br>
+                    <label for="rating">Rating:</label>
+                    <div id="star-rating">
+                    <i class="far fa-star" data-value="1"></i>
+                    <i class="far fa-star" data-value="2"></i>
+                    <i class="far fa-star" data-value="3"></i>
+                    <i class="far fa-star" data-value="4"></i>
+                    <i class="far fa-star" data-value="5"></i>
+                    </div>
+                    <input type="hidden" id="rating" name="rating" required>
+                    <button id="submit-rating">Submit Rating</button><br>
+                    <button id="report-button" class="report-btn">Report</button>
+                </div>
+                `);
+                marker.on('popupopen', function () {
+                    const starRating = document.getElementById('star-rating');
+                    const hiddenRatingInput = document.getElementById('rating');
+                    // Add event listener for stars
+                    starRating.addEventListener('click', function (event) {
+                        if (event.target.tagName === 'I') {
+                        const selectedValue = event.target.getAttribute('data-value');
+
+                        // Reset star states
+                        const stars = starRating.querySelectorAll('i');
+                        stars.forEach(star => {
+                            // Highlight stars up to the selected value
+                            if (star.getAttribute('data-value') <= selectedValue) {
+                            star.classList.remove('far'); // Unfilled star
+                            star.classList.add('fas');   // Filled star
+                            } else {
+                            star.classList.remove('fas'); // Filled star
+                            star.classList.add('far');    // Unfilled star
+                            }
+                        });
+
+                        // If clicked star is already selected, allow deselection
+                        if (hiddenRatingInput.value === selectedValue) {
+                            hiddenRatingInput.value = ''; // Clear the rating
+                            stars.forEach(star => star.classList.remove('fas', 'far')); // Reset all stars
+                            stars.forEach(star => star.classList.add('far')); // Reset to unfilled
+                        } else {
+                            hiddenRatingInput.value = selectedValue; // Update rating
+                        }
+                        }
+                    });
+                // Add click event for the submit rating button
+                document.getElementById('submit-rating').addEventListener('click', async function () {
+                    const rating = hiddenRatingInput.value;
+                    if (!rating) {
+                    alert('Please select a rating.');
+                    return;
+                    }
+                    const bathroomName = document.querySelector('strong').textContent;
+
+                    try {
+                    const response = await fetch('/submit-rating', {
+                        method: 'POST',
+                        headers: {
+                        'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                        name: bathroomName,
+                        rating: rating,
+                        }),
+                    });
+                    const result = await response.json();
+                    alert(result.message);
+                    } catch (error) {
+                    console.error('Error submitting rating:', error);
+                    }
+                });
+                // Add click event for the report button
+                document.getElementById('report-button').addEventListener('click', async function () {
+                const bathroomName = document.querySelector('strong').textContent;
+
+                try {
+                    const response = await fetch('/flag-toilet', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        name: bathroomName,
+                        reason: 'Flagged by user', // Add reason if needed
+                    }),
+                    });
+
+                    const result = await response.json();
+                    alert(result.message);
+                } catch (error) {
+                    console.error('Error flagging toilet:', error);
+                }
+                });
+                });
                 // Store the marker to remove later if needed
                 bathroomMarkers.push(marker);
                 // Create a list item for each bathroom
@@ -328,7 +449,6 @@
             });
             showLoadMoreButton();
         }
-
         // Show Load More button
         function showLoadMoreButton() {
             const button = document.getElementById('load-more-button');
@@ -343,11 +463,8 @@
                 document.querySelector('.container').appendChild(newButton);
             }
         }
-
         fetchBathroomLocations(currentPage);
-
         let watchID;
-
         document.getElementById('find-location').addEventListener('click', function() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(onSuccess, onError, {
@@ -355,7 +472,6 @@
                     timeout: 15000,
                     maximumAge: 0
                 });
-
                 navigator.geolocation.watchPosition(function(position) {
                     if (position.coords.accuracy < 25) { // Only use updates with < 50 meters accuracy
                         var lat = position.coords.latitude;
@@ -379,7 +495,6 @@
             } else {
                 alert('Geolocation is not supported by this browser.');
             }
-
             function onSuccess(position) {
                 var lat = position.coords.latitude;
                 var lon = position.coords.longitude;
@@ -395,12 +510,10 @@
                 // Fetch bathroom locations and display them
                 fetchBathroomLocations(); // Fetch data from Flask
             }
-
             function onError(error) {
                 alert('Geolocation error: ' + error.message);
             }
         });
-
         // Handle the back button click event
         document.getElementById('back-button').addEventListener('click', function() {
             window.history.back(); // Go back to the previous page
