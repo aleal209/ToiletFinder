@@ -84,7 +84,7 @@ def get_bathrooms():
          'gender': bathroom['Gender'],
          'accessible': bathroom['Accessible'], 'Floor': bathroom['Floor'], 'baby': bathroom['Baby Changing'],
          'dryer': bathroom['Hand Dryer'],
-         'sanitizer': bathroom['Hand Sanitizer'], 'cover': bathroom['Toilet Seat Cover']}
+         'sanitizer': bathroom['Hand Sanitizer'], 'cover': bathroom['Toilet Seat Cover'], 'ratings': bathroom['Ratings']}
         for bathroom in bathrooms
     ]
     
