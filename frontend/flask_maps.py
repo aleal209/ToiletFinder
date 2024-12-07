@@ -45,10 +45,10 @@ def profile():
         return flask.render_template('profile.html', name=name, reviews=reviews, rating=rating)
     for review in review_collection.find():
         if review['Username'] == name:
-            tmp = (review["Name"], review["Review"])
+            tmp = (review["Name"], int(review["Rating"]))
             count += 1
             reviews.append(tmp)
-            ratings.append(review["Review"])
+            ratings.append(review["Rating"])
     for r in ratings:
         rating += r
     if count == 0:
