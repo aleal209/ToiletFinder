@@ -333,6 +333,7 @@
                     <strong>${bathroom.name}</strong><br>
                     Gender: ${bathroom.gender}<br>
                     Distance: ${distance}<br>
+                    Rating: ${bathroom.ratings}<br>
                     <label for="rating">Rating:</label>
                     <div id="star-rating">
                     <i class="far fa-star" data-value="1"></i>
@@ -436,6 +437,8 @@
                     <h3 class="bathroom-name">${bathroom.name}</h3>
                     <p class="bathroom-gender">${bathroom.gender}</p>
                     <p class="bathroom-distance">Distance: <span class="distance-value">${distance}</span></p>
+                    <p class="bathroom-rating">${bathroom.ratings}</p>
+
                 `;
                 listView.appendChild(listItem);
                 listItem.addEventListener('click', function() {
